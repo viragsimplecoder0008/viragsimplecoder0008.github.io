@@ -1,8 +1,0 @@
-// whaa????
-
-#include <stdio.h>
-
-int main() {
-  printf("Whaa????")
-  
-}
