@@ -1,174 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>xHacker Terminal</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Courier New", monospace;
-      background: #000;
-      color: #0f0;
-    }
-    /* Navbar */
-    .navbar {
-      background: #111;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      border-bottom: 2px solid #0f0;
-    }
-    .navbar div {
-      margin: 0 10px;
-    }
-    .btn {
-      background: #0f0;
-      color: #000;
-      padding: 8px 16px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-    .btn:hover {
-      background: #ff0;
-      color: #000;
-      box-shadow: 0px 0px 10px #ff0;
-    }
-    /* Terminal area */
-    #terminal {
-      padding: 20px;
-      height: 70vh;
-      box-sizing: border-box;
-      overflow-y: auto;
-      font-size: 18px;
-      text-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
-    }
-    .line {
-      display: flex;
-      align-items: center;
-    }
-    .prompt {
-      margin-right: 5px;
-    }
-    .cmdline {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: #0f0;
-      outline: none;
-      font-family: inherit;
-      font-size: 1em;
-      caret-color: transparent; /* hide default caret */
-      position: relative;
-    }
-    /* Fake block cursor */
-    .cmdline::after {
-      content: "";
-      display: inline-block;
-      width: 10px;
-      height: 1.2em;
-      background: #0f0;
-      margin-left: 2px;
-      animation: blink 1s steps(1) infinite;
-      vertical-align: middle;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      50.01%, 100% { opacity: 0; }
-    }
-    footer {
-      background: #111;
-      padding: 15px;
-      font-size: 12px;
-      color: #888;
-      border-top: 2px solid #0f0;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xHacker Terminal</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Courier New", monospace;
+    background: #000;
+    color: #0f0;
+  }
+  /* Navbar */
+  .navbar {
+    background: #111;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    border-bottom: 2px solid #0f0;
+  }
+  .navbar div { margin: 0 10px; }
+  .btn {
+    background: #0f0;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+  .btn:hover { background: #ff0; box-shadow: 0 0 10px #ff0; }
+
+  /* Terminal */
+  #terminal {
+    padding: 20px;
+    height: 70vh;
+    box-sizing: border-box;
+    overflow-y: auto;
+    font-size: 18px;
+    text-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+  }
+  .line { display: flex; align-items: center; }
+  .prompt { margin-right: 5px; min-width: 150px; }
+  .input-wrap { position: relative; flex: 1; }
+  .cmdline {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 18px;
+    caret-color: transparent;
+  }
+  .block-caret {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 1.2em;
+    background: #0f0;
+    pointer-events: none;
+    animation: blink 1s steps(1) infinite;
+  }
+  .mirror {
+    position: absolute;
+    visibility: hidden;
+    white-space: pre;
+    font-family: monospace;
+    font-size: 18px;
+  }
+  @keyframes blink {0%,50%{opacity:1;}50.01%,100%{opacity:0;}}
+  footer {
+    background: #111;
+    padding: 15px;
+    font-size: 12px;
+    color: #888;
+    border-top: 2px solid #0f0;
+  }
+</style>
 </head>
 <body>
-  <!-- Navbar -->
-  <div class="navbar">
-    <div>X_Hacker Projects</div>
-    <div><a href="mailto:viraj.vmaster1@gmail.com" class="btn">HELP ME WITH DEV!</a></div>
-    <div><a href="projects/index.html" class="btn">Download My Projects, LOL</a></div>
+
+<!-- Navbar -->
+<div class="navbar">
+  <div>X_Hacker Projects</div>
+  <div>
+    <a href="mailto:viraj.vmaster1@gmail.com" class="btn">HELP ME WITH DEV!</a>
+    <a href="projects/index.html" class="btn">Download My Projects, LOL</a>
   </div>
+</div>
 
-  <!-- Terminal -->
-  <div id="terminal"></div>
+<!-- Terminal -->
+<div id="terminal"></div>
 
-  <!-- Footer -->
-  <footer>
-    ™ Of Nobody, LOL. <br>
-    This is, OFC, under the GNU General Public Lisence (srry IDK how to spell.) <br>
-    X_Hacker™, LOL
-  </footer>
+<!-- Footer -->
+<footer>
+  ™ Of Nobody, LOL. <br>
+  This is, OFC, under the GNU General Public Lisence (srry IDK how to spell.) <br>
+  X_Hacker™, LOL
+</footer>
 
-  <script>
-    const terminal = document.getElementById("terminal");
-    let cwd = "~"; // current dir
+<script>
+const terminal = document.getElementById("terminal");
+let cwd = "~"; // current directory
+const dirs = {
+  "~": ["goclean","projects","exit","store"],
+  "goclean": [],
+  "projects": ["GeoLang","RickRoll.html","README.md"],
+  "exit": [],
+  "store": ["TShirt-Black","Sticker-LOL"]
+};
 
-    function newPrompt() {
-      const line = document.createElement("div");
-      line.classList.add("line");
+// utility to build URL
+function dirUrl(name){
+  if(name==="projects") return "projects/index.html";
+  if(name==="goclean") return "goclean/index.html";
+  if(name==="store") return "store/index.html";
+  if(name==="exit") return "exit/index.html";
+  return encodeURIComponent(name)+"/";
+}
 
-      const prompt = document.createElement("span");
-      prompt.classList.add("prompt");
-      prompt.textContent = `user@xhacker:${cwd}$`;
+// create a new prompt line
+function newPrompt(){
+  const line = document.createElement("div");
+  line.classList.add("line");
 
-      const input = document.createElement("input");
-      input.classList.add("cmdline");
-      input.type = "text";
+  const prompt = document.createElement("span");
+  prompt.classList.add("prompt");
+  prompt.textContent = `user@xhacker:${cwd}$`;
 
-      line.appendChild(prompt);
-      line.appendChild(input);
-      terminal.appendChild(line);
-      input.focus();
+  const wrap = document.createElement("div");
+  wrap.classList.add("input-wrap");
 
-      input.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-          const cmd = input.value.trim();
-          handleCommand(cmd);
-          input.disabled = true;
-        }
-      });
+  const input = document.createElement("input");
+  input.classList.add("cmdline");
+  input.type = "text";
+  input.autocomplete = "off";
 
-      terminal.scrollTop = terminal.scrollHeight;
+  const caret = document.createElement("span");
+  caret.classList.add("block-caret");
+
+  const mirror = document.createElement("span");
+  mirror.classList.add("mirror");
+
+  wrap.appendChild(input);
+  wrap.appendChild(caret);
+  wrap.appendChild(mirror);
+  line.appendChild(prompt);
+  line.appendChild(wrap);
+  terminal.appendChild(line);
+  input.focus();
+  terminal.scrollTop = terminal.scrollHeight;
+
+  // mirror style
+  const style = getComputedStyle(input);
+  mirror.style.font = style.font;
+  mirror.style.fontSize = style.fontSize;
+  mirror.style.fontFamily = style.fontFamily;
+
+  // update caret
+  function updateCaret(){
+    mirror.textContent = input.value;
+    caret.style.left = mirror.offsetWidth + "px";
+  }
+  input.addEventListener("input", updateCaret);
+
+  // Enter key
+  input.addEventListener("keydown", (e)=>{
+    if(e.key==="Enter"){
+      const cmd = input.value.trim();
+      input.disabled = true;
+      handleCommand(cmd);
     }
+  });
+  updateCaret();
+}
 
-    function printLine(text="") {
-      const div = document.createElement("div");
-      div.textContent = text;
-      terminal.appendChild(div);
-    }
+// print output
+function printLine(text=""){
+  const div = document.createElement("div");
+  div.textContent = text;
+  terminal.appendChild(div);
+  terminal.scrollTop = terminal.scrollHeight;
+}
 
-    function handleCommand(cmd) {
-      if (cmd === "") {
-        newPrompt();
-        return;
-      }
-      const parts = cmd.split(" ");
-      const command = parts[0];
-      const arg = parts[1];
+// handle command logic
+function handleCommand(cmd){
+  if(cmd==="") return newPrompt();
 
-      if (command === "ls") {
-        printLine("geolang  rickroll.html  projects");
-      } else if (command === "cd") {
-        if (arg) cwd = arg;
-      } else if (command.startsWith("./")) {
-        const program = command.slice(2);
-        window.location.href = program + ".html";
-      } else {
-        printLine(`command not found: ${cmd}`);
-      }
-      newPrompt();
-    }
+  const parts = cmd.split(" ");
+  const command = parts[0];
+  const arg = parts[1];
 
-    // Start with first prompt
-    newPrompt();
-  </script>
+  if(command==="ls"){
+    printLine((dirs[cwd]||[]).join("  "));
+  } else if(command==="cd"){
+    if(arg) window.location.href = dirUrl(arg);
+  } else if(command.startsWith("./")){
+    const prog = command.slice(2);
+    window.location.href = dirUrl(prog);
+  } else {
+    printLine(`command not found: ${cmd}`);
+  }
+
+  newPrompt();
+}
+
+// start
+newPrompt();
+</script>
 </body>
 </html>
