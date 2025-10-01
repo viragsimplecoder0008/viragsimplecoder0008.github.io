@@ -124,7 +124,10 @@ function dirUrl(name){
 }
 
 // create a new prompt line
-function newPrompt(){
+function newPrompt() {
+  // hide all previous carets
+  document.querySelectorAll(".block-caret").forEach(c => c.style.display = "none");
+
   const line = document.createElement("div");
   line.classList.add("line");
 
@@ -161,23 +164,23 @@ function newPrompt(){
   mirror.style.fontSize = style.fontSize;
   mirror.style.fontFamily = style.fontFamily;
 
-  // update caret
-  function updateCaret(){
+  function updateCaret() {
     mirror.textContent = input.value;
     caret.style.left = mirror.offsetWidth + "px";
   }
-  input.addEventListener("input", updateCaret);
 
-  // Enter key
-  input.addEventListener("keydown", (e)=>{
-    if(e.key==="Enter"){
-      const cmd = input.value.trim();
+  input.addEventListener("input", updateCaret);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
       input.disabled = true;
-      handleCommand(cmd);
+      caret.style.display = "none"; // hide current caret
+      handleCommand(input.value.trim());
     }
   });
+
   updateCaret();
 }
+
 
 // print output
 function printLine(text=""){
